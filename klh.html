@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KLH Study Material</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #004080;
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-form, .search-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .upload-form input, .search-bar input {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .upload-form button {
+      padding: 0.75rem 1.5rem;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-form button:hover {
+      background-color: #003060;
+    }
+
+    .material-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .material-item {
+      background-color: #f9f9f9;
+      border-left: 4px solid #004080;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .material-item a {
+      color: #004080;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .material-meta {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>KLH Study Material</header>
+  <div class="container">
+    <!-- Search bar -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by Subject, Professor, or Chapter..." />
+    </div>
+
+    <!-- Upload form -->
+    <form class="upload-form" id="uploadForm">
+      <input type="text" id="subjectInput" placeholder="Subject Name" required />
+      <input type="text" id="professorInput" placeholder="Professor Name" required />
+      <input type="text" id="chapterInput" placeholder="Chapter" required />
+      <input type="file" id="fileInput" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <!-- Uploaded materials -->
+    <ul class="material-list" id="materialList"></ul>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const subjectInput = document.getElementById('subjectInput');
+    const professorInput = document.getElementById('professorInput');
+    const chapterInput = document.getElementById('chapterInput');
+    const materialList = document.getElementById('materialList');
+    const searchInput = document.getElementById('searchInput');
+
+    let materials = [];
+
+    uploadForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const material = {
+          name: file.name,
+          url: e.target.result,
+          subject: subjectInput.value.trim(),
+          professor: professorInput.value.trim(),
+          chapter: chapterInput.value.trim()
+        };
+        materials.push(material);
+        displayMaterials(materials);
+        uploadForm.reset();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    searchInput.addEventListener('input', function () {
+      const query = searchInput.value.toLowerCase();
+      const filtered = materials.filter(item =>
+        item.subject.toLowerCase().includes(query) ||
+        item.professor.toLowerCase().includes(query) ||
+        item.chapter.toLowerCase().includes(query)
+      );
+      displayMaterials(filtered);
+    });
+
+    function displayMaterials(list) {
+      materialList.innerHTML = '';
+      list.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'material-item';
+        li.innerHTML = `
+          <a href="${item.url}" download="${item.name}">${item.name}</a>
+          <div class="material-meta">
+            Subject: ${item.subject} | Professor: ${item.professor} | Chapter: ${item.chapter}
+          </div>
+        `;
+        materialList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
